@@ -156,6 +156,6 @@ def ShowAncilliaryParts():
  Part.show(pins)
 
 # Make the parts and show them
-cc = ContractedCycloid()
-Part.show(cc)
-ShowAncilliaryParts()
+#cc = ContractedCycloid()
+#Part.show(cc)
+#ShowAncilliaryParts()
