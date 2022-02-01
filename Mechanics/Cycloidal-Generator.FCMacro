@@ -18,9 +18,37 @@
 # The faceting can be made as fine as you like though.
 # 
 
+import time
+import threading
+from urllib.request import urlopen
+from urllib.error import URLError
 import math as maths
 import Part
 from FreeCAD import Base
+import FreeCADGui
+
+from mod.translation_tools import __
+from mod.freecad_tools import check_compatibility, document_count, prompt_close_all_documents, get_fc_main_window, get_fc_object
+from mod.freecad_tools import delete_existing_docks, valid_document_environment, enforce_case_limits_restrictions, enforce_fillbox_restrictions
+from mod.dialog_tools import info_dialog
+from mod.stdout_tools import print_license, log, debug
+
+from mod.constants import APP_NAME, VERSION, DEFAULT_WORKBENCH, DIVIDER, GITHUB_MASTER_CONSTANTS_URL
+
+from mod.dataobjects.case import Case
+from mod.dataobjects.application_settings import ApplicationSettings
+
+from mod.widgets.dock.designsphysics_dock import DesignSPHysicsDock
+from mod.widgets.properties_dock_widget import PropertiesDockWidget
+
+__author__ = "Adrian Bowyer"
+__copyright__ = "Copyright 2021-2022,  RepRap Ltd"
+__credits__ = ["Adrian Bowyer", "Lawrence Kincheloe"]
+__license__ = "GPL"
+__version__ = VERSION
+__maintainer__ = "Adrian Bowyer"
+__email__ = ""
+__status__ = "Development"
 
 #*****************************************************************************************************************************
 
@@ -28,18 +56,20 @@ from FreeCAD import Base
 # See https://www.tec-science.com/mechanical-power-transmission/planetary-gear/construction-of-the-cycloidal-disc/
 # All dimensions are in mm.
 
-D = 50  # Pin circle centres diameter
+D = 50  # Pin circle centres diameter, reference circle diameter of the fixed ring pins D
 dp = 5.3  # Pin diameter
 n = 8    # Number of lobes
-N = 9  # Number of pins
+N = 9  # Number of fixed pins
 dr = 5.3  # inner roller pin diameter
-dd = 34 # inner roller pin centres diameter
+dd = 34 # inner roller pin centres diameter, reference circle diameter dd of the roller pins on the roller disc
+do = 60 # outer shell
 rollerHoles = 4 # Number of roller holes (must equal n or divide into n exactly)
 eFactor = 0.3 # Sets the eccentricity. Must be less than 0.5. If it's too big the faceting will be inaccurate, so increase circle below.
 dc = 24.1 # Diameter of central hole
 bearingLength = 3 # How thick to make the contracted cycloidal disc
-lip = 0.25 # Create a lip to constrain axial drift. Set to -1 to supress.
+lip = -1 # Create a lip to constrain axial drift. Set to -1 to supress.
 circle = 800 # Sets the faceting to correspond to 1 degree; a 360-faced polygon. Bigger for finer faceting (use even numbers).
+L = 3 # Number of cycloidal segments
 
 #***************************************************************************************************************************
 
@@ -51,6 +81,13 @@ delta = D/N
 print("Rolling circle diameter: " + str(delta))
 d = i*D/N
 print("Base circle diamater: " + str(d))
+#diameter of outer ring 
+exdelta = dp #D/N #D/n
+print("outer Rolling circle diameter: " + str(exdelta))
+exd = D # N/(N-n)*D/N  #delta * N 
+print("outer ring diamater: " + str(exd))
+exe = exdelta*eFactor*1.6666666666666666
+print("outer ring Eccentricity: " + str(exe))
 e = delta*eFactor
 print("Eccentricity: " + str(e))
 dh = dr + 2*e
@@ -114,8 +151,61 @@ def ContractedCycloidBlank():
   result = result.fuse(loft).fuse(loft2).fuse(lipExtrude1).fuse(lipExtrude2)
  return result
 
+
+def OuterTest():
+ return Part.makeCylinder(D/2,L*bearingLength, Base.Vector(0, 0, 0), Base.Vector(0, 0, 1))
+
+def OuterContractedCycloidalTrack():
+
+
+ offsetCycloid = []
+ if lip > 0:
+  lipWire = []
+#X points on base hypotrochoid
+ x = exd/2 + exdelta/2   #(n*delta/2)-delta/2 + delta/2 #d/2 + delta/2
+ y = 0
+ circlePi = circle*0.5
+ for theta in range(circle+3):
+  xNew = ((exd + exdelta)/2)*maths.cos(theta*maths.pi/circlePi)
+  yNew = ((exd + exdelta)/2)*maths.sin(theta*maths.pi/circlePi)
+  phi =  exd*theta/delta
+  xNew += (exe)*maths.cos((theta+phi)*maths.pi/circlePi)
+  yNew += (exe)*maths.sin((theta+phi)*maths.pi/circlePi)
+  if theta >= 2:
+   dxy = NormalVector(xOld, xNew, yOld, yNew, dp/2)
+   offsetCycloid.append(App.Vector(x + dxy[0], y + dxy[1], 0))
+   if lip > 0:
+    dxy = NormalVector(xOld, xNew, yOld, yNew, dp/2 - lip)
+    lipWire.append(App.Vector(x + dxy[0], y + dxy[1], 0))
+  xOld = x
+  yOld = y
+  x = xNew
+  y = yNew
+# print("appended list: " + str(offsetCycloid))
+ offsetCycloidWire=Part.makePolygon(offsetCycloid)
+ face=Part.Face(offsetCycloidWire)
+ cycloidFace = face.extrude(Base.Vector(0, 0, L*bearingLength))
+ outerWall =  Part.makeCylinder(do/2,L*bearingLength, Base.Vector(0, 0, 0), Base.Vector(0, 0, 1))
+ outerCycloid = outerWall.cut(cycloidFace)
+ outerCycloid.rotate(Base.Vector(0, 0, 0),Base.Vector(0, 0, 1),  180/N)
+ result = outerCycloid
+ if lip > 0:
+  lipWire=Part.makePolygon(lipWire)
+  lipWire.translate(Base.Vector(0, 0, -lip))
+  lipFace1 = Part.Face(lipWire)
+  lipExtrude1 = lipFace1.extrude(Base.Vector(0, 0, -lip))
+  lipExtrude2 = lipExtrude1.copy().translate(Base.Vector(0, 0, bearingLength+3*lip))
+  loft = [lipWire, offsetCycloidWire]
+  loft = Part.makeLoft(loft, True, False)
+  lipWire.translate(Base.Vector(0, 0, L*(bearingLength+2*lip)))
+  offsetCycloidWire.translate(Base.Vector(0, 0, bearingLength))
+  loft2 = [lipWire, offsetCycloidWire]
+  loft2 = Part.makeLoft(loft2, True, False)
+  result = result.fuse(loft).fuse(loft2).fuse(lipExtrude1).fuse(lipExtrude2)
+ return result
+
 def RollerHole():
- roller = Part.makeCylinder(dh/2, bearingLength, Base.Vector(0, 0, 0), Base.Vector(0, 0, 1))
+ roller = Part.makeCylinder(dh/2, L*bearingLength, Base.Vector(0, 0, 0), Base.Vector(0, 0, 1))
  if lip > 0:
   roller = roller.fuse(Part.makeCone(dh/2, dh/2-lip, lip, Base.Vector(0, 0, bearingLength), Base.Vector(0, 0, 1)))
   roller = roller.fuse(Part.makeCone(dh/2, dh/2-lip, lip, Base.Vector(0, 0, 0), Base.Vector(0, 0, -1)))
@@ -150,12 +240,23 @@ def ShowAncilliaryParts():
  pins = NullSet()
  ainc = 360/N
  for r in range(N):
-  pin = Part.makeCylinder(dp/2, bearingLength, Base.Vector(D/2, 0, 0), Base.Vector(0, 0, 1))
+  pin = Part.makeCylinder(dp/2, L*bearingLength, Base.Vector(D/2, 0, 0), Base.Vector(0, 0, 1))
   pin.rotate(Base.Vector(0, 0, 0),Base.Vector(0, 0, 1), r*ainc)
   pins = pins.fuse(pin)
+ ccc = OuterContractedCycloidalTrack()
+ pins = pins.fuse(ccc)
+ #Part.show(ccc)
  Part.show(pins)
 
+
+
 # Make the parts and show them
-cc = ContractedCycloid()
-Part.show(cc)
+
+for disks in range(L):
+ cc = ContractedCycloid()
+ cc.rotate(Base.Vector(0, 0, 0),Base.Vector(0, 0, 1), disks*90/(L))
+ cc.translate(Base.Vector(0, 0,( (disks)*bearingLength)))
+ Part.show(cc)
+
+#Part.show(OuterTest())
 ShowAncilliaryParts()
