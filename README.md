@@ -48,7 +48,7 @@ Jupiter-CadQuery: https://github.com/bernhard-42/jupyter-cadquery
 
 ## Proof of Concept
 
-  The first proof of concept, will utilize a fully designed 
+  The first proof of concept, will utilize a fully parametrized 3D printed shredder drum
 
 ## First Release
 
@@ -56,6 +56,8 @@ Jupiter-CadQuery: https://github.com/bernhard-42/jupyter-cadquery
 
 ## Production and Manufacturing
 
-# Projects used:
+# Cycloidal Generators:
 https://github.com/RepRapLtd/RobotComponents/tree/main/RRL-cycloidal-drive
-
+https://github.com/mawildoer/cycloidal_generator
+https://github.com/mikedh/cycloidal
+https://hackaday.io/project/168498-opencyre
