@@ -9,12 +9,13 @@ The goal of this project is to democratize the knowledge and empower individuals
 Initially, non-uniform plastic objects need to be mechanically broken down into a uniform format that can be processed into new products. This first process requires a shredder, which is a machine that mechanically breaks plastic down into uniform pieces of a desired size.
 
 The shredder needs to be relatively quiet and be able to handle the recyclable plastic seen in modern society. 
-
-| Recycle #1 | PET | polyethylene terephthalate |
-| Recycle #2 | HDPE | polyethylene, high density |
-| Recycle #3 | PVC | poly(vinyl chloride) |
-| Recycle #4 | LDPE | polyethylene, low density |
-| Recycle #5 | PP | polypropylene |
+| Plastic #  |Abbr. |Description                 |
+|------------|------|----------------------------|
+| Recycle #1 | PET  | polyethylene terephthalate | 
+| Recycle #2 | HDPE | polyethylene, high density | 
+| Recycle #3 | PVC  | poly(vinyl chloride)       | 
+| Recycle #4 | LDPE | polyethylene, low density  | 
+| Recycle #5 | PP   | polypropylene              | 
 
 
 Plastics can have fillers, contamination, or be damaged from UV, thermal, or mechanical stress that change their initial properties. In these cases, mixing in additive plastics can help mitigate the damage and restore some of the materials initial properties. Additive plastics can be freshly manufactured plastic or plastics with complementary properties. We're investigating if https://docs.plasticscanner.com/ can be used to fill this need.
