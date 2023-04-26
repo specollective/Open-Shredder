@@ -61,3 +61,6 @@ https://github.com/RepRapLtd/RobotComponents/tree/main/RRL-cycloidal-drive
 https://github.com/mawildoer/cycloidal_generator
 https://github.com/mikedh/cycloidal
 https://hackaday.io/project/168498-opencyre
+
+## Related Projects
+https://github.com/CubeFactory2/cubefactory
