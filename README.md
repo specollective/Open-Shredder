@@ -56,6 +56,10 @@ Jupiter-CadQuery: https://github.com/bernhard-42/jupyter-cadquery
 
 ## Production and Manufacturing
 
+## Call for Collaboration: Open Problems
+
+  The project would benefit from a mechanical engineer or an expert 3D modeler, as the component geometries are getting complex. Also, the prime power drive is non obvious. Most commercial shredders use high speed, low torque electric AC motors with a gear reduction mechanism, which both increase cost and are non-standard. A creative solution would utilize the impact resistance of certain plastics to incorporate a fly wheel impact driver mechanism to increase the total torque output of the device. It is believed that doing so will allow for an almost completely 3D printed shredder. 
+
 # Cycloidal Generators:
 https://github.com/RepRapLtd/RobotComponents/tree/main/RRL-cycloidal-drive
 https://github.com/mawildoer/cycloidal_generator
@@ -64,3 +68,4 @@ https://hackaday.io/project/168498-opencyre
 
 ## Related Projects
 https://github.com/CubeFactory2/cubefactory
+https://plasticscanner.com/
