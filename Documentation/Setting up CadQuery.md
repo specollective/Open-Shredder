@@ -17,5 +17,6 @@ For installing locally, use miniconda to install just the files needed. Select t
 https://docs.conda.io/en/latest/miniconda.html
 
 After successfully installing, follow the below instructions for the operating system you're running. 
+If you run into issues regarding "conda", try restarting windows or closing your terminal to reload your path.
 
 https://github.com/bernhard-42/jupyter-cadquery
