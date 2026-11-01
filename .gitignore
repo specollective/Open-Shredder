@@ -24,3 +24,19 @@ fp-info-cache
 # Exported BOM files
 *.xml
 *.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*.class
+
+# Generated Models
+*.step
+*.stp
+*.stl
+
+# Build123d Gearbox Parameters
+# Keep the schema, but ignore local optimized configs if desired?
+# Actually, users might want to save optimized configs.
+# But for now, let's ignore the optimized one to avoid cluttering repo unless explicitly added.
+Mechanics/Build123d_Gearbox/parameters/optimized_shredder_config.json

@@ -61,6 +61,27 @@ Jupiter-CadQuery: https://github.com/bernhard-42/jupyter-cadquery
 
   The project would benefit from a mechanical engineer or an expert 3D modeler, as the component geometries are getting complex. Also, the prime power drive is non obvious. Most commercial shredders use high speed, low torque electric AC motors with a gear reduction mechanism, which both increase cost and are non-standard. A creative solution would utilize the impact resistance of certain plastics to incorporate a fly wheel impact driver mechanism to increase the total torque output of the device. It is believed that doing so will allow for an almost completely 3D printed shredder. 
 
+# Motor Selection
+
+After reviewing the project requirements for a home-friendly, quiet, and 3D-printable capable shredder, we have selected the **NEMA 34 Stepper Motor** as the prime mover.
+
+### Reasons for Selection:
+1.  **High Torque:** NEMA 34 motors offer significantly higher holding torque (often 4-12 Nm) compared to NEMA 23, which is crucial for shredding solid chunks of plastic.
+2.  **Quiet Operation:** Unlike universal AC motors or gearbox-driven DC motors, stepper motors run relatively quietly, making them suitable for home environments.
+3.  **Direct Compatibility with Printed Gearbox:** The low speed of the stepper (typically <1000 RPM useful range) matches well with a single-stage cycloidal reduction (10:1 to 20:1) without requiring complex multi-stage gearing.
+4.  **Future Proofing:** The NEMA 34 mounting standard is a common target for "3D Printed Brushless Motor" projects. By designing the gearbox for a NEMA 34 interface, this shredder can easily be upgraded to a DIY printable motor in the future.
+
+### Configuration
+- **Mounting Hole Spacing:** 69.6 mm
+- **Shaft Diameter:** 14.0 mm
+- **Driver:** A high-voltage (AC powered or 60V+ DC) stepper driver (e.g., DM860T) is recommended to maximize torque at speed.
+
+### Alternative Option: Windshield Wiper Motor
+For a low-cost, high-torque salvage option, the gearbox also supports a **Generic Wiper Motor** pattern.
+- **Mounting:** 3-Bolt pattern (approx 2" / 50.8mm bolt circle).
+- **Configuration:** Set `motor_type="WIPER"` in the assembly script.
+- **Note:** Requires a high-current 12V DC power supply (e.g., PC PSU or Car Battery). Mounting holes may need slotting for specific motor variations.
+
 # Cycloidal Generators:
 https://github.com/RepRapLtd/RobotComponents/tree/main/RRL-cycloidal-drive
 https://github.com/mawildoer/cycloidal_generator

@@ -1,0 +1,41 @@
+{
+    "motor": {
+        "type": "NEMA34",
+        "torque_nm": 4.5,
+        "shaft_diameter_mm": 14.0,
+        "housing_od_mm": 120.0,
+        "mount_spacing_mm": 69.6,
+        "max_rpm": 600.0
+    },
+    "gearbox": {
+        "ratio": 10.0,
+        "num_lobes": 10,
+        "num_pins": 11,
+        "pin_circle_diameter_mm": 50.0,
+        "housing_height_mm": 40.0,
+        "input_shaft_length_mm": 60.0,
+        "output_shaft_hex_mm": 25.0,
+        "output_shaft_length_mm": 150.0,
+        "use_impact_drive": true
+    },
+    "shredder": {
+        "drum_diameter_mm": 150.0,
+        "drum_length_mm": 254.0,
+        "num_disks": 10,
+        "disk_thickness_mm": 25.4,
+        "hex_bore_mm": 25.0,
+        "num_teeth_per_disk": 2,
+        "fixed_knife_clearance_mm": 1.0
+    },
+    "material": {
+        "shaft_yield_strength_mpa": 250.0,
+        "housing_yield_strength_mpa": 30.0,
+        "density_kg_m3": 7850.0
+    },
+    "bearing": {
+        "series": "6006",
+        "inner_diameter_mm": 30.0,
+        "outer_diameter_mm": 55.0,
+        "width_mm": 13.0
+    }
+}
